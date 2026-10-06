@@ -24,6 +24,17 @@ Included in this phase:
 - Wallet-address plan status lookups via contract calls
 - REST endpoints for local testing and automation
 
+## Phase 3: Frontend wallet dashboard
+
+This phase includes a browser-based wallet dashboard for selecting plans, connecting MetaMask, and viewing plan status.
+
+Included in this phase:
+
+- Wallet connection via MetaMask
+- Data plan selection and purchase flow
+- Real-time status and activity updates
+- Configuration via environment variables for the deployed contract
+
 ## Project roadmap
 
 ### Phase 1 — Smart contract foundation (completed)
@@ -32,13 +43,13 @@ Included in this phase:
 - Test coverage for core behaviors
 - Base Sepolia network configuration
 
-### Phase 2 — Middleware / backend bridge (current)
+### Phase 2 — Middleware / backend bridge (completed)
 - Event listener for `PlanPurchased`, `PlanToppedUp`, `DataConsumed`, and `PlanExpired`
 - Backend service to trigger eSIM or provisioning actions
 - Mock telecom simulation for local development
 - Webhook support and queueing
 
-### Phase 3 — Frontend wallet dashboard
+### Phase 3 — Frontend wallet dashboard (completed scaffold)
 - Wallet connection via MetaMask or WalletConnect
 - Purchase and top-up plan flow
 - Real-time status checks
@@ -56,8 +67,8 @@ Included in this phase:
 - Hardhat
 - Ethers.js
 - Express.js
+- Vite + vanilla JS dashboard
 - Base Sepolia testnet
-- MetaMask / wallet integration in upcoming frontend phase
 
 ## Quick start
 
@@ -93,6 +104,19 @@ Included in this phase:
    npm run backend:start
    ```
 
+8. Set up the frontend config:
+   ```bash
+   cd frontend
+   cp .env.example .env
+   ```
+
+9. Launch the frontend dashboard:
+   ```bash
+   cd frontend
+   npm install
+   npm run dev -- --host
+   ```
+
 ## Contract behavior
 
 The `MobileDecentralizedPlan` contract supports:
@@ -122,6 +146,16 @@ The mock telecom layer handles actions such as:
 - top-up mobile plan provision
 - suspend or revoke a profile when the data is exhausted
 
+## Live integration checklist
+
+Before running the frontend against a deployed contract:
+
+- Deploy the contract to Base Sepolia
+- Copy the deployed address into `frontend/.env` as `VITE_CONTRACT_ADDRESS`
+- Ensure your wallet has Base Sepolia ETH from a faucet
+- Keep the backend running at `http://localhost:4000`
+- Open the Vite dashboard and connect MetaMask
+
 ## Notes
 
-This phase establishes the bridge between blockchain state and telecom operations. The next phase will add a browser-based wallet dashboard to interact with the contract and backend in real time.
+The project now includes a working foundation across blockchain, middleware, and frontend layers. The remaining production work is primarily security review, environment hardening, and live testnet validation.

@@ -1,0 +1,146 @@
+import { BrowserProvider, Contract, ethers } from 'ethers';
+import { APP_CONFIG } from './config.js';
+import './style.css';
+
+const CONTRACT_ABI = [
+  'function provider() view returns (address)',
+  'function purchasePlan(uint256 _dataInGB) payable',
+  'function checkPlanStatus(address _user) view returns (bool active, uint256 remainingGB, uint256 timeLeft)',
+  'event PlanPurchased(address indexed user, uint256 dataAmountGB, uint256 expiryTimestamp)',
+  'event PlanToppedUp(address indexed user, uint256 addedDataGB, uint256 expiryTimestamp)',
+  'event DataConsumed(address indexed user, uint256 dataUsedBytes, uint256 remainingDataBytes)',
+  'event PlanExpired(address indexed user)'
+];
+
+const state = {
+  selectedGB: 1,
+  signer: null,
+  contract: null,
+  provider: null,
+};
+
+const planGrid = document.getElementById('planGrid');
+const selectedPlan = document.getElementById('selectedPlan');
+const walletAddress = document.getElementById('walletAddress');
+const connectWalletBtn = document.getElementById('connectWalletBtn');
+const confirmPurchaseBtn = document.getElementById('confirmPurchaseBtn');
+const refreshStatusBtn = document.getElementById('refreshStatusBtn');
+const remainingData = document.getElementById('remainingData');
+const timeLeft = document.getElementById('timeLeft');
+const providerAddressEl = document.getElementById('providerAddress');
+const statusPill = document.getElementById('statusPill');
+const walletDisplay = document.getElementById('walletDisplay');
+const activityList = document.getElementById('activityList');
+
+const formatDuration = (seconds) => {
+  if (!seconds || Number(seconds) <= 0) return '0 min';
+  const totalMinutes = Math.max(1, Math.floor(Number(seconds) / 60));
+  return `${totalMinutes} min`;
+};
+
+const addActivity = (message) => {
+  const item = document.createElement('li');
+  item.textContent = message;
+  activityList.prepend(item);
+  while (activityList.children.length > 5) activityList.removeChild(activityList.lastChild);
+};
+
+const setConnectedWallet = (address) => {
+  walletAddress.value = address;
+  walletDisplay.textContent = `${address.slice(0, 6)}...${address.slice(-4)}`;
+};
+
+const setStatus = (active) => {
+  statusPill.className = `status-pill ${active ? 'online' : 'offline'}`;
+  statusPill.innerHTML = `<span class="dot"></span> ${active ? 'Active' : 'Inactive'}`;
+};
+
+const updateStatus = async () => {
+  if (!state.contract || !state.signer) {
+    remainingData.textContent = '0 GB';
+    timeLeft.textContent = '0 min';
+    setStatus(false);
+    return;
+  }
+
+  try {
+    const wallet = await state.signer.getAddress();
+    const [active, remainingGB, timeLeftSeconds] = await state.contract.checkPlanStatus(wallet);
+    setStatus(active);
+    remainingData.textContent = `${Number(remainingGB)} GB`;
+    timeLeft.textContent = formatDuration(timeLeftSeconds);
+    addActivity(active ? 'Plan is currently active' : 'Plan is inactive');
+  } catch (error) {
+    console.error(error);
+    addActivity('Unable to fetch current plan status');
+  }
+};
+
+const ensureContractReady = () => {
+  if (!APP_CONFIG.contractAddress || APP_CONFIG.contractAddress === '0x0000000000000000000000000000000000000000') {
+    addActivity('Contract not configured yet. Set VITE_CONTRACT_ADDRESS in frontend/.env');
+    return false;
+  }
+  return true;
+};
+
+planGrid.addEventListener('click', (event) => {
+  const option = event.target.closest('.plan-option');
+  if (!option) return;
+  planGrid.querySelectorAll('.plan-option').forEach((el) => el.classList.remove('active'));
+  option.classList.add('active');
+  state.selectedGB = Number(option.dataset.gb);
+  selectedPlan.value = `${state.selectedGB} GB`;
+});
+
+connectWalletBtn.addEventListener('click', async () => {
+  if (!window.ethereum) {
+    addActivity('MetaMask not detected. Install a wallet to continue.');
+    return;
+  }
+
+  try {
+    if (!ensureContractReady()) return;
+    state.provider = new BrowserProvider(window.ethereum);
+    state.signer = await state.provider.getSigner();
+    const address = await state.signer.getAddress();
+    state.contract = new Contract(APP_CONFIG.contractAddress, CONTRACT_ABI, state.signer);
+    setConnectedWallet(address);
+    addActivity(`Connected wallet ${address.slice(0, 8)}...`);
+
+    const providerAddress = await state.contract.provider();
+    providerAddressEl.textContent = `${providerAddress.slice(0, 6)}...${providerAddress.slice(-4)}`;
+    await updateStatus();
+  } catch (error) {
+    console.error(error);
+    addActivity('Wallet connection failed');
+  }
+});
+
+confirmPurchaseBtn.addEventListener('click', async () => {
+  if (!state.contract || !state.signer) {
+    addActivity('Connect a wallet before activating a plan');
+    return;
+  }
+
+  try {
+    if (!ensureContractReady()) return;
+    const amount = ethers.parseEther((state.selectedGB * 0.005).toString());
+    addActivity(`Submitting purchase for ${state.selectedGB} GB…`);
+    const tx = await state.contract.purchasePlan(state.selectedGB, { value: amount });
+    await tx.wait();
+    addActivity(`Purchase successful for ${state.selectedGB} GB`);
+    await updateStatus();
+  } catch (error) {
+    console.error(error);
+    addActivity('Plan purchase failed');
+  }
+});
+
+refreshStatusBtn.addEventListener('click', async () => {
+  await updateStatus();
+});
+
+providerAddressEl.textContent = 'Loading…';
+selectedPlan.value = `${state.selectedGB} GB`;
+addActivity(`Configured network: Base Sepolia (${APP_CONFIG.chainId})`);
