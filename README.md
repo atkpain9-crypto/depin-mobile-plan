@@ -2,7 +2,7 @@
 
 Decentralized mobile plan smart contract with DePIN integration, backend middleware, and Web3 frontend dashboard.
 
-## Phase 1: Smart Contract Foundation
+## Phase 1: Smart contract foundation
 
 This repository starts with the blockchain foundation of the mobile plan system:
 
@@ -12,16 +12,28 @@ This repository starts with the blockchain foundation of the mobile plan system:
 - Automated smart contract tests
 - Developer documentation for setup and deployment
 
+## Phase 2: Backend bridge and telecom middleware
+
+This phase adds a lightweight backend service that listens to on-chain events and triggers a provisioning flow for a DePIN telecom stack.
+
+Included in this phase:
+
+- Express.js server for local and cloud middleware
+- Event listener for the deployed contract
+- Mock eSIM / telecom provisioning integration service
+- Wallet-address plan status lookups via contract calls
+- REST endpoints for local testing and automation
+
 ## Project roadmap
 
-### Phase 1 — Smart contract foundation (current)
+### Phase 1 — Smart contract foundation (completed)
 - Deployable mobile data plan contract
 - Purchase, top-up, status checks, and usage deduction flow
 - Test coverage for core behaviors
 - Base Sepolia network configuration
 
-### Phase 2 — Middleware / backend bridge
-- Event listener for `PlanPurchased` and `DataConsumed`
+### Phase 2 — Middleware / backend bridge (current)
+- Event listener for `PlanPurchased`, `PlanToppedUp`, `DataConsumed`, and `PlanExpired`
 - Backend service to trigger eSIM or provisioning actions
 - Mock telecom simulation for local development
 - Webhook support and queueing
@@ -43,6 +55,7 @@ This repository starts with the blockchain foundation of the mobile plan system:
 - Solidity 0.8.20
 - Hardhat
 - Ethers.js
+- Express.js
 - Base Sepolia testnet
 - MetaMask / wallet integration in upcoming frontend phase
 
@@ -75,6 +88,11 @@ This repository starts with the blockchain foundation of the mobile plan system:
    npx hardhat run scripts/deploy.js --network baseSepolia
    ```
 
+7. Start the backend listener:
+   ```bash
+   npm run backend:start
+   ```
+
 ## Contract behavior
 
 The `MobileDecentralizedPlan` contract supports:
@@ -89,6 +107,21 @@ It stores a per-user mobile data plan with:
 - expiry timestamp
 - active/inactive status
 
+## Backend service behavior
+
+The middleware watches the contract and reacts to events such as:
+
+- `PlanPurchased`
+- `PlanToppedUp`
+- `DataConsumed`
+- `PlanExpired`
+
+The mock telecom layer handles actions such as:
+
+- activate eSIM profile
+- top-up mobile plan provision
+- suspend or revoke a profile when the data is exhausted
+
 ## Notes
 
-This is the initial blockchain foundation for a DePIN telecom concept. The next phase will connect contract events to a backend service that can trigger provisioning or eSIM lifecycle actions.
+This phase establishes the bridge between blockchain state and telecom operations. The next phase will add a browser-based wallet dashboard to interact with the contract and backend in real time.

@@ -2,16 +2,24 @@
   "name": "depin-mobile-plan",
   "version": "1.0.0",
   "private": true,
-  "description": "Decentralized mobile plan contract, deployment scripts, tests, and middleware roadmap for Base Sepolia",
+  "description": "Decentralized mobile plan contract, deployment scripts, tests, backend bridge, and roadmap for Base Sepolia",
   "scripts": {
     "compile": "npx hardhat compile",
     "test": "npx hardhat test",
     "deploy:base-sepolia": "npx hardhat run scripts/deploy.js --network baseSepolia",
-    "node": "npx hardhat node"
+    "node": "npx hardhat node",
+    "backend:start": "node backend/server.js",
+    "backend:dev": "nodemon backend/server.js"
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox": "^5.0.0",
     "dotenv": "^16.4.5",
-    "hardhat": "^2.22.13"
+    "hardhat": "^2.22.13",
+    "nodemon": "^3.1.19"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "ethers": "^6.13.2",
+    "express": "^4.21.2"
   }
 }
