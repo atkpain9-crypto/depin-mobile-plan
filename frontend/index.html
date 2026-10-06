@@ -1,0 +1,354 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DePIN Mobile Plan</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <script type="module" src="/src/main.js"></script>
+    <style>
+      :root {
+        --bg: #07111f;
+        --panel: #101d2d;
+        --panel-alt: #0d1826;
+        --accent: #48d6a9;
+        --accent-2: #5eb8ff;
+        --warning: #ffd166;
+        --text: #edf3ff;
+        --muted: #a7b3c7;
+        --danger: #ff6b6b;
+        --border: rgba(255,255,255,0.08);
+      }
+
+      * { box-sizing: border-box; }
+      html, body { margin: 0; padding: 0; font-family: 'Inter', sans-serif; background: radial-gradient(circle at top, #10213a 0%, var(--bg) 35%); color: var(--text); }
+      body { min-height: 100vh; }
+      a { color: inherit; text-decoration: none; }
+      button, input { font: inherit; }
+      .app { max-width: 1240px; margin: 0 auto; padding: 32px 18px 60px; }
+      .topbar { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 20px 8px 28px; }
+      .brand { display: flex; align-items: center; gap: 12px; font-weight: 800; letter-spacing: 0.04em; }
+      .brand-mark { width: 28px; height: 28px; border-radius: 8px; background: linear-gradient(135deg, var(--accent), var(--accent-2)); box-shadow: 0 8px 30px rgba(72,214,169,0.35); }
+      .wallet-button { background: rgba(255,255,255,0.04); padding: 10px 16px; border-radius: 999px; border: 1px solid var(--border); color: var(--text); cursor: pointer; }
+      .wallet-button:hover { border-color: rgba(94,184,255,0.6); }
+      .hero { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 22px; }
+      .panel { background: rgba(16,29,45,0.9); border: 1px solid var(--border); border-radius: 24px; box-shadow: 0 30px 80px rgba(0,0,0,0.25); }
+      .hero-copy { padding: 32px; }
+      .eyebrow { color: var(--accent); font-size: 12px; letter-spacing: 0.18em; text-transform: uppercase; font-weight: 700; }
+      h1 { font-size: clamp(2.5rem, 4vw, 4.2rem); line-height: 1.04; margin: 16px 0 14px; }
+      .lead { color: var(--muted); font-size: 1.08rem; line-height: 1.7; max-width: 620px; }
+      .cta-row { margin-top: 24px; display: flex; flex-wrap: wrap; gap: 14px; }
+      .primary-btn, .secondary-btn { border-radius: 14px; padding: 14px 18px; border: 1px solid transparent; cursor: pointer; font-weight: 700; }
+      .primary-btn { background: linear-gradient(135deg, var(--accent), #3fc6db); color: #03131b; }
+      .secondary-btn { background: rgba(255,255,255,0.02); border-color: var(--border); color: var(--text); }
+      .stats { margin-top: 24px; display: grid; grid-template-columns: repeat(3, minmax(120px, 1fr)); gap: 14px; }
+      .stat { background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 18px; padding: 18px; }
+      .stat-label { color: var(--muted); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.10em; }
+      .stat-value { margin-top: 10px; font-size: 1.5rem; font-weight: 800; }
+      .card { padding: 26px; }
+      .card-header { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 16px; }
+      .card-title { font-size: 1.1rem; font-weight: 700; }
+      .chip { background: rgba(72,214,169,0.09); border: 1px solid rgba(72,214,169,0.35); color: var(--accent); border-radius: 999px; padding: 6px 10px; font-size: 12px; }
+      .plan-grid { display: grid; gap: 14px; }
+      .plan-option { background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 16px; padding: 16px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
+      .plan-option.active { border-color: rgba(72,214,169,0.7); background: rgba(72,214,169,0.06); }
+      .plan-meta strong { display: block; font-size: 1.02rem; margin-bottom: 6px; }
+      .plan-meta span { color: var(--muted); font-size: 0.9rem; }
+      .plan-price { font-weight: 800; font-size: 1.3rem; }
+      .summary { margin-top: 18px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+      .form-row { display: grid; gap: 8px; }
+      .form-row label { color: var(--muted); font-size: 0.83rem; }
+      .form-row input { width: 100%; padding: 12px 14px; border: 1px solid var(--border); border-radius: 12px; background: rgba(255,255,255,0.02); color: var(--text); }
+      .actions { margin-top: 18px; display: flex; gap: 12px; }
+      .primary-btn.full { width: 100%; }
+      .content-grid { display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 22px; margin-top: 26px; }
+      .status-box { padding: 20px; display: grid; gap: 14px; }
+      .status-row { display: flex; justify-content: space-between; align-items: center; margin-top: 2px; }
+      .status-pill { display: inline-flex; align-items: center; gap: 8px; padding: 8px 12px; border-radius: 999px; font-size: 12px; font-weight: 700; }
+      .status-pill.online { background: rgba(72,214,169,0.08); color: var(--accent); }
+      .status-pill.offline { background: rgba(255,107,107,0.08); color: var(--danger); }
+      .dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
+      .mini-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+      .metric { background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 16px; padding: 14px; }
+      .metric-label { color: var(--muted); font-size: 12px; }
+      .metric-value { margin-top: 8px; font-size: 1.4rem; font-weight: 800; }
+      .activity { padding: 24px; }
+      .activity-list { list-style: none; padding: 0; margin: 16px 0 0; display: grid; gap: 12px; }
+      .activity-list li { padding: 14px 16px; background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 12px; color: var(--muted); }
+      .muted { color: var(--muted); }
+      @media (max-width: 920px) {
+        .hero, .content-grid { grid-template-columns: 1fr; }
+        .stats { grid-template-columns: 1fr; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app">
+      <header class="topbar">
+        <div class="brand">
+          <div class="brand-mark"></div>
+          <span>DePIN Mobile</span>
+        </div>
+        <button class="wallet-button" id="connectWalletBtn">Connect wallet</button>
+      </header>
+
+      <main>
+        <section class="hero">
+          <div class="panel hero-copy">
+            <div class="eyebrow">Decentralized cellular access</div>
+            <h1>Activate mobile data on-chain.</h1>
+            <p class="lead">
+              Purchase a plan, maintain a live data state, and coordinate provisioning through a wallet-first DePIN flow built for Base Sepolia.
+            </p>
+            <div class="cta-row">
+              <button class="primary-btn" id="buyPlanBtn">Buy plan</button>
+              <button class="secondary-btn" id="refreshStatusBtn">Refresh status</button>
+            </div>
+            <div class="stats">
+              <div class="stat">
+                <div class="stat-label">Network</div>
+                <div class="stat-value">Base</div>
+              </div>
+              <div class="stat">
+                <div class="stat-label">Plan Type</div>
+                <div class="stat-value">DePIN</div>
+              </div>
+              <div class="stat">
+                <div class="stat-label">Provisioning</div>
+                <div class="stat-value">Live</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel card">
+            <div class="card-header">
+              <div class="card-title">Choose a data plan</div>
+              <div class="chip">Base Sepolia</div>
+            </div>
+            <div class="plan-grid" id="planGrid">
+              <div class="plan-option active" data-gb="1">
+                <div class="plan-meta">
+                  <strong>1 GB</strong>
+                  <span>30-day cycle</span>
+                </div>
+                <div class="plan-price">0.005 ETH</div>
+              </div>
+              <div class="plan-option" data-gb="5">
+                <div class="plan-meta">
+                  <strong>5 GB</strong>
+                  <span>30-day cycle</span>
+                </div>
+                <div class="plan-price">0.025 ETH</div>
+              </div>
+              <div class="plan-option" data-gb="10">
+                <div class="plan-meta">
+                  <strong>10 GB</strong>
+                  <span>30-day cycle</span>
+                </div>
+                <div class="plan-price">0.05 ETH</div>
+              </div>
+            </div>
+
+            <div class="summary">
+              <div class="form-row">
+                <label for="walletAddress">Wallet address</label>
+                <input id="walletAddress" readonly placeholder="Not connected" />
+              </div>
+              <div class="form-row">
+                <label for="selectedPlan">Selected plan</label>
+                <input id="selectedPlan" value="1 GB" readonly />
+              </div>
+            </div>
+
+            <div class="actions">
+              <button class="primary-btn full" id="confirmPurchaseBtn">Activate plan</button>
+            </div>
+          </div>
+        </section>
+
+        <section class="content-grid">
+          <div class="panel status-box">
+            <div class="card-header">
+              <div class="card-title">Plan status</div>
+              <div class="status-pill online" id="statusPill"><span class="dot"></span> Active</div>
+            </div>
+
+            <div class="mini-grid">
+              <div class="metric">
+                <div class="metric-label">Remaining data</div>
+                <div class="metric-value" id="remainingData">0 GB</div>
+              </div>
+              <div class="metric">
+                <div class="metric-label">Time left</div>
+                <div class="metric-value" id="timeLeft">0 min</div>
+              </div>
+            </div>
+
+            <div class="status-row">
+              <span class="muted">Connectivity</span>
+              <strong id="networkState">Online</strong>
+            </div>
+            <div class="status-row">
+              <span class="muted">Wallet</span>
+              <strong id="walletDisplay">Not connected</strong>
+            </div>
+            <div class="status-row">
+              <span class="muted">Provider</span>
+              <strong id="providerAddress">Loading…</strong>
+            </div>
+          </div>
+
+          <div class="panel activity">
+            <div class="card-title">Recent activity</div>
+            <ul class="activity-list" id="activityList">
+              <li>Waiting for wallet connection…</li>
+            </ul>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script type="module">
+      import { ethers } from 'https://cdn.jsdelivr.net/npm/ethers@6.13.2/+esm';
+
+      const contractAddress = '0x0000000000000000000000000000000000000000';
+      const abi = [
+        'function provider() view returns (address)',
+        'function purchasePlan(uint256 _dataInGB) payable',
+        'function checkPlanStatus(address _user) view returns (bool active, uint256 remainingGB, uint256 timeLeft)',
+        'event PlanPurchased(address indexed user, uint256 dataAmountGB, uint256 expiryTimestamp)',
+        'event PlanToppedUp(address indexed user, uint256 addedDataGB, uint256 expiryTimestamp)',
+        'event DataConsumed(address indexed user, uint256 dataUsedBytes, uint256 remainingDataBytes)',
+        'event PlanExpired(address indexed user)'
+      ];
+
+      const state = {
+        selectedGB: 1,
+        signer: null,
+        provider: null,
+        contract: null,
+      };
+
+      const planGrid = document.getElementById('planGrid');
+      const selectedPlan = document.getElementById('selectedPlan');
+      const walletAddress = document.getElementById('walletAddress');
+      const connectWalletBtn = document.getElementById('connectWalletBtn');
+      const confirmPurchaseBtn = document.getElementById('confirmPurchaseBtn');
+      const refreshStatusBtn = document.getElementById('refreshStatusBtn');
+      const remainingData = document.getElementById('remainingData');
+      const timeLeft = document.getElementById('timeLeft');
+      const providerAddressEl = document.getElementById('providerAddress');
+      const statusPill = document.getElementById('statusPill');
+      const walletDisplay = document.getElementById('walletDisplay');
+      const activityList = document.getElementById('activityList');
+
+      const formatDuration = (seconds) => {
+        if (!seconds || Number(seconds) <= 0) return '0 min';
+        const totalMinutes = Math.max(1, Math.floor(Number(seconds) / 60));
+        return `${totalMinutes} min`;
+      };
+
+      const addActivity = (message) => {
+        const item = document.createElement('li');
+        item.textContent = message;
+        activityList.prepend(item);
+
+        while (activityList.children.length > 5) {
+          activityList.removeChild(activityList.lastChild);
+        }
+      };
+
+      const setConnectedWallet = (address) => {
+        walletAddress.value = address;
+        walletDisplay.textContent = `${address.slice(0, 6)}...${address.slice(-4)}`;
+      };
+
+      const updateStatus = async () => {
+        if (!state.contract || !state.signer) {
+          remainingData.textContent = '0 GB';
+          timeLeft.textContent = '0 min';
+          statusPill.className = 'status-pill offline';
+          statusPill.innerHTML = '<span class="dot"></span> Offline';
+          return;
+        }
+
+        try {
+          const wallet = await state.signer.getAddress();
+          const [active, remainingGB, timeLeftSeconds] = await state.contract.checkPlanStatus(wallet);
+          const nextStatus = active ? 'online' : 'offline';
+          statusPill.className = `status-pill ${nextStatus}`;
+          statusPill.innerHTML = `<span class="dot"></span> ${active ? 'Active' : 'Inactive'}`;
+          remainingData.textContent = `${Number(remainingGB)} GB`;
+          timeLeft.textContent = formatDuration(timeLeftSeconds);
+          addActivity(active ? 'Plan is currently active' : 'Plan is inactive');
+        } catch (error) {
+          console.error(error);
+          addActivity('Unable to fetch current plan status');
+        }
+      };
+
+      planGrid.addEventListener('click', (event) => {
+        const option = event.target.closest('.plan-option');
+        if (!option) return;
+
+        planGrid.querySelectorAll('.plan-option').forEach((el) => el.classList.remove('active'));
+        option.classList.add('active');
+        state.selectedGB = Number(option.dataset.gb);
+        selectedPlan.value = `${state.selectedGB} GB`;
+      });
+
+      connectWalletBtn.addEventListener('click', async () => {
+        if (!window.ethereum) {
+          addActivity('MetaMask not detected. Install wallet to continue.');
+          return;
+        }
+
+        try {
+          const browserProvider = new ethers.BrowserProvider(window.ethereum);
+          state.provider = browserProvider;
+          state.signer = await browserProvider.getSigner();
+          const address = await state.signer.getAddress();
+
+          state.contract = new ethers.Contract(contractAddress, abi, state.signer);
+          setConnectedWallet(address);
+          addActivity(`Connected wallet ${address.slice(0, 8)}...`);
+
+          const providerAddress = await state.contract.provider();
+          providerAddressEl.textContent = `${providerAddress.slice(0, 6)}...${providerAddress.slice(-4)}`;
+          await updateStatus();
+        } catch (error) {
+          console.error(error);
+          addActivity('Wallet connection failed');
+        }
+      });
+
+      confirmPurchaseBtn.addEventListener('click', async () => {
+        if (!state.contract || !state.signer) {
+          addActivity('Connect a wallet before activating a plan');
+          return;
+        }
+
+        try {
+          const amount = ethers.parseEther((state.selectedGB * 0.005).toString());
+          const tx = await state.contract.purchasePlan(state.selectedGB, { value: amount });
+          addActivity(`Submitting purchase for ${state.selectedGB} GB…`);
+          await tx.wait();
+          addActivity(`Purchase successful for ${state.selectedGB} GB`);
+          await updateStatus();
+        } catch (error) {
+          console.error(error);
+          addActivity('Plan purchase failed');
+        }
+      });
+
+      refreshStatusBtn.addEventListener('click', async () => {
+        await updateStatus();
+      });
+
+      providerAddressEl.textContent = 'Loading…';
+      selectedPlan.value = `${state.selectedGB} GB`;
+    </script>
+  </body>
+</html>
